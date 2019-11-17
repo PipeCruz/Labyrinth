@@ -29,7 +29,7 @@ public class Labyrinth {
     private Maze maze;
     private Player player;
     private ArrayList<Question> usedQuestions;
-    private boolean blindPunish,brickPunish,flipRC;
+    private boolean blindPunish,brickPunish,flipRC,scram;
     private int correct;
     private ImageView playerIco;
     private Position endPosition;
@@ -40,9 +40,12 @@ public class Labyrinth {
         usedQuestions = qs.getUsedQuestions();
         playerIco = new ImageView(new Image("/Pictures/PlayerIcon.png"));
         correct=0;
+
         blindPunish = false;
         brickPunish=false;
         flipRC=false;
+        scram=false;//implement this
+
     }
 
     @FXML public void initialize(){
@@ -351,7 +354,7 @@ public class Labyrinth {
                 }
             }
         }catch(IllegalArgumentException e){
-            System.out.println(e.getStackTrace());
+            System.out.println(Arrays.toString(e.getStackTrace()));
             Window.println("CATCH");
         }finally{
             Window.println("FINALLY");
