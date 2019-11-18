@@ -43,7 +43,7 @@ public class ArrQs {
         allQuestions.add(new Question("_________ the pants or I'll _________ you!\n(1 word)","Eliminate",positions.get(0)));
         allQuestions.add(new Question("_____ blue uniform pants","Ugly",positions.get(1)));
         allQuestions.add(new Question("Take out a _____ __ _____!","Sheet Of Paper",positions.get(2)));
-        allQuestions.add(new Question("[REDACTED] In F_______!\nUsed by Rico to express controversial ideas","ortnite",positions.get(3)));
+        allQuestions.add(new Question("[REDACTED] In F_______!\nUsed by Rico to express controversial ideas\n(complete word)","ortnite",positions.get(3)));
         allQuestions.add(new Question("A very common name Rico yells out:\n_______!","LINDNER",positions.get(4)));
         allQuestions.add(new Question("The bane of every teachers existence\n(singular article of clothing)","Hoodie",positions.get(5)));
         allQuestions.add(new Question("Put on your __!","ID",positions.get(6)));
@@ -54,7 +54,7 @@ public class ArrQs {
         allQuestions.add(new Question("There are no smart _______ this year!","freshmen",positions.get(11)));
         allQuestions.add(new Question("_____ the dog\nThe reason many disliked this class","Karel",positions.get(12)));
         allQuestions.add(new Question("__._ ____ per second per second\nWhat rico has to say about gravity","32.2 feet",positions.get(13)));
-        allQuestions.add(new Question("What does Rico always wear the fist day of school?\n(Single word)","Suit",positions.get(14)));
+        allQuestions.add(new Question("What does Rico always wear the fist day of school?\n(Open House too)\n(Single word)","Suit",positions.get(14)));
         allQuestions.add(new Question("The Rico games pitts what two colors against each other?\nR__ and ____)","red blue",positions.get(15)));
         allQuestions.add(new Question("What's the acronym for the second project\ngiven to students in their freshman year by Rico? (____)","WBRL",positions.get(16)));
         allQuestions.add(new Question("The classroom 4412 belongs to which Engineering Teacher?\nMr.________","Escobedo",positions.get(17)));
