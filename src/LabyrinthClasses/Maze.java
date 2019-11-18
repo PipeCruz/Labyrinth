@@ -1,9 +1,8 @@
 package LabyrinthClasses;
 
 public class Maze {
+
 	private boolean[][] maze;
-//	private Position _start;
-//	private Position _end;
 
 	public boolean[][] getMaze() { return maze; }
 

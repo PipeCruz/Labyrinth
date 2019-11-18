@@ -6,9 +6,9 @@ public class Question {
 
     public String getQuestion(){return question;}
     public String getAnswer(){return answer;}
-    public Position getqPos(){return qPos;}
+    public Position getPos(){return qPos;}
 
-    public Question(String question, String answer, Position qPos){
+    Question(String question, String answer, Position qPos){
         this.question=question;
         this.answer=answer;
         this.qPos = qPos;
