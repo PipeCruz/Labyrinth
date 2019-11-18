@@ -12,10 +12,12 @@ import java.io.IOException;
 
 
 public class Main extends Application {
-
+    //main
     public static void main(String[] args) {
         launch(args);
     }
+
+    //initialize javafx application
     @Override
     public void start(Stage primaryStage) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("/Files/Labyrinth.fxml"));

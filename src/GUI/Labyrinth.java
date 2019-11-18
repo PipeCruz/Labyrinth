@@ -20,84 +20,85 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Labyrinth {
-    //TODO
-    //SPRITE
-    //EXIT
-
-    @FXML public GridPane gridMaze;
-    @FXML public MenuButton menuButton;
+    private final ArrayList<Question> usedQuestions;
+    private final int numQuestions;
 
     //Instance variables
     private Maze maze;
     private Player player;
-    private ArrayList<Question> usedQuestions;
-    private boolean blindPunish,brickPunish,flipRC,scram;
-    private int correct,numQuestions,scramCount;
-    private ImageView playerIco;
-    private Position endPosition;
+    private final ImageView playerIco;
+    private boolean blindPunish, brickPunish, flipRC, scram;
+    private final Position endPosition;
+    //FXML linked instance vars
+    @FXML
+    private GridPane gridMaze;
+    @FXML
+    private MenuButton menuButton;
+    private int correct;
+    private int scramCount;
 
-    public Labyrinth(){
-        endPosition = new Position(22,8);
+    //this constructor constructs the gui elements necessary
+    public Labyrinth() {
+        endPosition = new Position(22, 8);
         ArrQs qs = new ArrQs();
         usedQuestions = qs.getUsedQuestions();
         playerIco = new ImageView(new Image("/Pictures/PlayerIcon.png"));
-        correct=0;
-        numQuestions=usedQuestions.size();
-        scramCount=0;
+        correct = 0;
+        numQuestions = usedQuestions.size();
+        scramCount = 0;
 
         blindPunish = false;
-        brickPunish=false;
-        flipRC=false;
-        scram=false;//implement this
+        brickPunish = false;
+        flipRC = false;
+        scram = false;
 
     }
 
-    @FXML public void initialize(){
-        Intro.intro();//maybe change this to be another scene that will then load this scene?
+    //shows intro then initializes the instance variables not linked to the FXML document
+    @FXML
+    private void initialize() {
+        Intro.intro();
         maze = new Maze();
         player = new Player();
         firstLoad();
     }
 
-
-    @FXML public void updateMap(KeyEvent k) {
-        if(k.getCode()== KeyCode.W){
-            player.move(Direction.North,maze);
+    //updates the map after each time the player moves
+    @FXML
+    private void updateMap(KeyEvent k) {
+        KeyCode kCode = k.getCode();
+        if (kCode == KeyCode.W) {
+            player.move(Direction.North, maze);
             updateMaze();
-        }else if(k.getCode()==KeyCode.A){
-            player.move(Direction.West,maze);
+        } else if (kCode == KeyCode.A) {
+            player.move(Direction.West, maze);
             updateMaze();
-        }else if(k.getCode()==KeyCode.S){
-            player.move(Direction.South,maze);
+        } else if (kCode == KeyCode.S) {
+            player.move(Direction.South, maze);
             updateMaze();
-        }else if(k.getCode()==KeyCode.D){
-            player.move(Direction.East,maze);
+        } else if (kCode == KeyCode.D) {
+            player.move(Direction.East, maze);
             updateMaze();
         }
     }
 
+    //updates the maze so that the tiles are placed where they should be
+    //this method is EXTEMELY inneficient and the tiles should not move this much
     private void updateMaze() {
         Random random = new Random();
         gridMaze.getChildren().remove(playerIco);
         scramCount++;
-        if(scram && scramCount%15==0 && !blindPunish){
-            gridMaze.getChildren().remove(0,265);
-            for(int i = 0; i < maze.getMaze().length; i++){
-                for(int j = 0; j < maze.getMaze()[i].length; j++){
-                    if(random.nextInt(10)>5){
-                        gridMaze.add(new ImageView(new Image("/Pictures/brickWall.jpg")),j,i);
-                    }else{
-                        gridMaze.add(new ImageView(new Image("/Pictures/brickPath.jpg")),j,i);
-                    }
-                }
-            }
+        if (scram && scramCount % 15 == 0 && !blindPunish) {
+            gridMaze.getChildren().remove(0, 265);
+            helpUpdate(random);
         }
-        for(int i = 0; i < maze.getMaze().length; i++){
-            for(int j = 0; j < maze.getMaze()[i].length; j++){
-                if(player.getPosition().equals(new Position(i,j))){
-                    gridMaze.add(playerIco,j,i);
+        for (int i = 0; i < maze.getMaze().length; i++) {
+            for (int j = 0; j < maze.getMaze()[i].length; j++) {
+                if (player.getPosition().equals(new Position(i, j))) {
+                    gridMaze.add(playerIco, j, i);
                     System.out.println("player is at:" + i + "," + j);
-                }if(player.getPosition().equals(endPosition)){
+                }
+                if (player.getPosition().equals(endPosition)) {
                     end();
                 }
             }
@@ -105,8 +106,22 @@ public class Labyrinth {
         gameCheck();
     }
 
+    //helper method for above , this method scrambles the tiles
+    private void helpUpdate(Random random) {
+        for (int i = 0; i < maze.getMaze().length; i++) {
+            for (int j = 0; j < maze.getMaze()[i].length; j++) {
+                if (random.nextInt(10) > 5) {
+                    gridMaze.add(new ImageView(new Image("/Pictures/brickWall.jpg")), j, i);
+                } else {
+                    gridMaze.add(new ImageView(new Image("/Pictures/brickPath.jpg")), j, i);
+                }
+            }
+        }
+    }
+
+    //when the player finishes the labyrinth they are prompted with a dialog box showing their score on the questions
     private void end() {
-        double percent = (100.0*correct)/numQuestions;
+        double percent = (100.0 * correct) / numQuestions;
         DecimalFormat df = new DecimalFormat("##.##");
         String d = df.format(percent);
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -114,27 +129,21 @@ public class Labyrinth {
         stage.getIcons().add(
                 new Image("/Pictures/icon.png"));
         alert.setHeaderText("Congratulations! You finished with a " + d + "% ");
-        String options = (percent == 100.0? "You really must be a Terra student.\nSad!"
+        String options = (percent == 100.0 ? "You really must be a Terra student.\nSad!"
                 : (percent > 85.0 ? "You could pass as a Terra student but it would be a little suspicious"
                 : (percent < 75.0 ? "You don't go to Terra?\nWhat are you even doing here?"
-                :(percent >= 75 && percent <= 85 ? "You're almost a nerd(!)\nBe proud if you want.": null)))
-        ) ;
+                : (percent >= 75 && percent <= 85 ? "You're almost a nerd(!)\nBe proud if you want." : null)))
+        );
         alert.setContentText(options);
         ButtonType buttonTypeOne = new ButtonType("CLOSE");
         alert.getButtonTypes().setAll(buttonTypeOne);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == buttonTypeOne){
-            stage.close();
-            System.exit(0);
-
-        } else {
-            stage.close();
-            System.exit(0);
-        }
+        stage.close();
+        System.exit(0);
     }
 
-    // FIXME: 11/16/2019
+    // checks current status of player in the map
     private void gameCheck() {
         for (Question q : usedQuestions) {
             if(player.getPosition().equals(q.getPos())) {
@@ -159,7 +168,7 @@ public class Labyrinth {
                     valid(true,q,userIn);
                 }else{
                     System.out.println("INCORRECT");
-                    valid(false,q,userIn);//punish the user
+                    valid(false, q, userIn);//punish the user
                 }
                 dialog.close();
                 usedQuestions.remove(q);
@@ -168,8 +177,9 @@ public class Labyrinth {
         }
     }
 
-     private void valid(boolean b, Question q, AtomicReference<String> userIn) {
-        if(b){
+    //checks the user's answer to a question, and if incorrect punishes them
+    private void valid(boolean b, Question q, AtomicReference<String> userIn) {
+        if (b) {
             correct++;
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
@@ -182,19 +192,17 @@ public class Labyrinth {
             alert.getDialogPane().getScene().getWindow().setOnCloseRequest(Event::consume);
             alert.setContentText("Onwards!\n(existing effects will be removed!)");
             alert.showAndWait();
-
             if (blindPunish) {
-                for(int i = 0; i< maze.getMaze().length; i++){
-                    for(int j = 0; j <maze.getMaze()[0].length; j++){
-                        if(maze.getMaze()[i][j]){
-                            gridMaze.add(new ImageView(new Image("/Pictures/brickWall.jpg")),j,i);
-                        }
-                        else {
-                            gridMaze.add(new ImageView(new Image("/Pictures/brickPath.jpg")),j,i);
+                for (int i = 0; i < maze.getMaze().length; i++) {
+                    for (int j = 0; j < maze.getMaze()[0].length; j++) {
+                        if (maze.getMaze()[i][j]) {
+                            gridMaze.add(new ImageView(new Image("/Pictures/brickWall.jpg")), j, i);
+                        } else {
+                            gridMaze.add(new ImageView(new Image("/Pictures/brickPath.jpg")), j, i);
                         }
                     }
                 }
-                blindPunish=false;
+                blindPunish = false;
             }
             if (brickPunish) {
                 for(int i = 0; i< maze.getMaze().length; i++){
@@ -228,22 +236,17 @@ public class Labyrinth {
                     for(int j = 0; j <maze.getMaze()[0].length; j++){
                         if(maze.getMaze()[i][j]){
                             gridMaze.add(new ImageView(new Image("/Pictures/brickWall.jpg")),j,i);
-                        }
-                        else {
+                        } else {
                             System.out.println(false);
-                            gridMaze.add(new ImageView(new Image("/Pictures/brickPath.jpg")),j,i);
+                            gridMaze.add(new ImageView(new Image("/Pictures/brickPath.jpg")), j, i);
                         }
                     }
                 }
-                scram=false;
+                scram = false;
             }
-
-
-
-//DO NOT PUNISH OK PIPE
         }
 
-        if(!b){
+        if (!b) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
             stage.getIcons().add(
@@ -255,9 +258,9 @@ public class Labyrinth {
             alert.showAndWait();
             punish();
         }
-
     }
 
+    //punishes the player when a question is incorrect by sending them to the start, scrambling tiles, or inverting rows and columms
     private void punish() {
         Random random = new Random();
         int x = random.nextInt(5);
@@ -288,11 +291,11 @@ public class Labyrinth {
                 gridMaze.getChildren().remove(0, 529);
                 blindPunish = true;
             }
-                for(int i = 0; i < maze.getMaze().length; i++){
-                    for(int j = 0; j < maze.getMaze()[i].length; j++){
-                        gridMaze.add(new ImageView(new Image("/Pictures/brickWall.jpg")),j,i);
-                    }
+            for(int i = 0; i < maze.getMaze().length; i++){
+                for(int j = 0; j < maze.getMaze()[i].length; j++){
+                    gridMaze.add(new ImageView(new Image("/Pictures/brickWall.jpg")),j,i);
                 }
+            }
 
             alert(
                     "Bricks,Bricks,Bricks!\nSame path, just more bricks.",
@@ -322,8 +325,6 @@ public class Labyrinth {
                     "?deneppaH thaW",
                     "R,C-->C,R!"
             );
-
-
         }else if(x==0){//scramble it randomly with new boolean scram
             System.out.println("SCRAMBLE");
             if(!scram){
@@ -331,16 +332,8 @@ public class Labyrinth {
                     gridMaze.getChildren().remove(0,529);
                     blindPunish=false;
                 }
-                scram=true;
-                for(int i = 0; i < maze.getMaze().length; i++){
-                    for(int j = 0; j < maze.getMaze()[i].length; j++){
-                        if(random.nextInt(10)>5){
-                            gridMaze.add(new ImageView(new Image("/Pictures/brickWall.jpg")),j,i);
-                        }else{
-                            gridMaze.add(new ImageView(new Image("/Pictures/brickPath.jpg")),j,i);
-                        }
-                    }
-                }
+                scram = true;
+                helpUpdate(random);
             }
             alert(
                     "Its like a nice soup of brick.\nActivates every few moves.",
@@ -348,13 +341,13 @@ public class Labyrinth {
                     ":blender noises:"
             );
         }
-
     }
 
+    //used to generate an alert box
     private void alert(String content, String header, String title) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add( new Image("/Pictures/icon.png"));
+        stage.getIcons().add(new Image("/Pictures/icon.png"));
 
         alert.setContentText(content);
         alert.setHeaderText(header);
@@ -362,7 +355,10 @@ public class Labyrinth {
         alert.showAndWait();
     }
 
-    @FXML public void exit() {//FIXME 11/17/19
+    //exit dialog
+    //user chose to keep playing or exit
+    @FXML
+    private void exit() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
         stage.getIcons().add(
@@ -374,7 +370,7 @@ public class Labyrinth {
         alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeCancel);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == buttonTypeOne){
+        if (result.isPresent() && result.get() == buttonTypeOne) {
             // ... user chose "One"
             System.out.println("kept playing");
         } else {
@@ -382,20 +378,23 @@ public class Labyrinth {
             System.exit(0);
             // ... user chose CANCEL or closed the dialog
         }
-
     }
 
-    @FXML public void openMenu(MouseEvent mouseEvent) {
-        if(menuButton.isShowing() && mouseEvent.getEventType().equals(MouseEvent.MOUSE_EXITED_TARGET)){
+    //they open the menu button
+    @FXML
+    private void openMenu(MouseEvent mouseEvent) {
+        if (menuButton.isShowing() && mouseEvent.getEventType().equals(MouseEvent.MOUSE_EXITED_TARGET)) {
             System.out.println("menu opened");
             menuButton.hide();
-        }else if(mouseEvent.getEventType().equals(MouseEvent.MOUSE_ENTERED_TARGET)){
+        } else if (mouseEvent.getEventType().equals(MouseEvent.MOUSE_ENTERED_TARGET)) {
             System.out.println("menu closed");
             menuButton.show();
         }
     }
 
-    @FXML public void help() {
+    //they open the help dialog
+    @FXML
+    public void help() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
         stage.getIcons().add(
@@ -409,17 +408,19 @@ public class Labyrinth {
         alert.showAndWait();
     }
 
-    @FXML private void firstLoad() {
-        try{
-            for(int i = 0; i< maze.getMaze().length; i++){
-                for(int j = 0; j <maze.getMaze()[0].length; j++){
-                    if(maze.getMaze()[i][j]){
-                        gridMaze.add(new ImageView(new Image("/Pictures/brickWall.jpg")),j,i);
+    //initial load
+    @FXML
+    private void firstLoad() {
+        try {
+            for (int i = 0; i < maze.getMaze().length; i++) {
+                for (int j = 0; j < maze.getMaze()[0].length; j++) {
+                    if (maze.getMaze()[i][j]) {
+                        gridMaze.add(new ImageView(new Image("/Pictures/brickWall.jpg")), j, i);
+                    } else {
+                        gridMaze.add(new ImageView(new Image("/Pictures/brickPath.jpg")), j, i);
                     }
-                    else {
-                        gridMaze.add(new ImageView(new Image("/Pictures/brickPath.jpg")),j,i);
-                    }if(player.getPosition().equals(new Position(i,j))){
-                        gridMaze.add(playerIco,j,i);
+                    if (player.getPosition().equals(new Position(i, j))) {
+                        gridMaze.add(playerIco, j, i);
                     }
                 }
             }
